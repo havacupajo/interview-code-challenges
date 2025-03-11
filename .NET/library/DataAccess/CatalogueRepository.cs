@@ -44,5 +44,23 @@ namespace OneBeyondApi.DataAccess
                 return list.ToList();
             }
         }
+
+        public List<BorrowerWithLoans> GetBorrowersWithActiveLoans()
+        {
+            using (var context = new LibraryContext())
+            {
+                var borrowersWithLoans = context.Catalogue
+                    .Where(x => x.OnLoanTo != null)
+                    .GroupBy(x => x.OnLoanTo)
+                    .Select(g => new BorrowerWithLoans
+                    {
+                        Borrower = g.Key,
+                        LoanedBooks = g.Select(x => x.Book.Name).ToList()
+                    })
+                    .ToList();
+
+                return borrowersWithLoans;
+            }
+        }
     }
 }
